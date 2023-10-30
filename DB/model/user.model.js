@@ -4,7 +4,7 @@ const userShema=new Schema({
         type:String,
         required:true,
         min:4,
-        max:20
+        max:20,
     },
     email:{
         type:String,
@@ -18,6 +18,7 @@ const userShema=new Schema({
     },
     image:{
         type:Object,
+        required:true,
     },
     phone:{
   type:String,

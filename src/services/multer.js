@@ -15,4 +15,5 @@ function fileUpload(customValidation = []){
     const upload = multer({fileFilter,storage});
     return upload;
 }
+
 export default fileUpload;

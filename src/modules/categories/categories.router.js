@@ -11,4 +11,5 @@ router.get('/active',auth(endPoint.getActive),categoriesController.getActiveCate
 router.get('/:id',auth(endPoint.specific),categoriesController.SpecificCategory);
 router.post('/',auth(endPoint.create),fileUpload(fileValidation.image).single('image'),categoriesController.createCategory)
 router.put('/:id',auth(endPoint.update),fileUpload(fileValidation.image).single('image'),categoriesController.updateCategory)
+
 export default router;

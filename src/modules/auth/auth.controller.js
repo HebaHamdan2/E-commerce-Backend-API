@@ -4,13 +4,13 @@ import cloudinary from "../../services/cloudinary.js";
 import jwt from 'jsonwebtoken';
 import { sendEmail } from "../../services/email.js";
 import { customAlphabet, nanoid } from 'nanoid'
-export const signUp=async(req,res)=>{
+export const signUp=async(req,res,next)=>{
    try{
     const {userName,email,password}=req.body;
 
     const user=await userModel.findOne({email});
     if(user){
-        return res.status(409).json({message:"email already exists"});
+        return next(new Error("email already exists",{cause:409}))
     }
     const hashedPassword= bcrypt.hashSync(password,parseInt(process.env.SALT_ROUND));
     const {secure_url,public_id}= await cloudinary.uploader.upload(req.file.path,{
@@ -31,12 +31,16 @@ export const signIn=async(req,res)=>{
     if(!user){
         return res.status(400).json({message:"data invalid"})
     }
+    if(!user.confirmEmail){
+        return res.status(400).json({message:"plz confirm your email"});
+    }
+
     const match =await bcrypt.compare(password,user.password);
     if(!match){
         return res.status(200).json({message:"success",user});
 
     }
-    const token =jwt.sign({id:user._id,role:user.role,status:user.status},process.env.LOGINSECRET,{expiresIn:'5m'});
+    const token =jwt.sign({id:user._id,role:user.role,status:user.status},process.env.LOGINSECRET)//,{expiresIn:'5m'});//important fot security like Banks case
     const refreshToken=jwt.sign({id:user._id,role:user.role,status:user.status},process.env.LOGINSECRET,{expiresIn:60*60*24*30})
    return res.status(200).json({message:"success",token,refreshToken})
 }
@@ -49,7 +53,7 @@ export const confirmEmail=async(req,res)=>{
  }
  const user =await userModel.findOneAndUpdate({email:decoded.email,confirmEmail:false},{confirmEmail:true});
  if(!user){
-    return res.redirect(process.env.LOGINFRONEND)
+    return res.redirect(process.env.LOGINFRONTEND)
     
  }
 }
@@ -78,6 +82,12 @@ export const forgetPasseword=async(req,res)=>{
     }
     user.password=await bcrypt.hash(password,parseInt(process.env.SALT_ROUND));
     user.sendCode=null;
+    user.changePasswordTime=Date.now();//to  log out from accounts that sign in with old password
     await user.save();
     return res.status(200).json({message:"success"})
+}
+export const deleteInvalidConfirm=async(req,res)=>{
+
+    const users=await userModel.deleteMany({confirmEmail:false});
+    return res.status(200).json({message:"success"});
 }

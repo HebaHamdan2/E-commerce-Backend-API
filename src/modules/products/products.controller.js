@@ -19,7 +19,7 @@ if(!checksubCategory){
     return res.status(404).json({message:"sub category not found"});
 }
  req.body.slug=slugify(name);
-req.body.finalPrice=price-(price*(discount||0)/100);
+req.body.finalPrice=price-(price*(discount||0)/100).toFixed(2);
 const {public_id,secure_url}=await cloudinary.uploader.upload(req.files.mainImage[0].path,{folder:`${process.env.APP_NAME}/product/${req.body.name}/mainImage`});
 req.body.mainImage={public_id,secure_url};
 req.body.subImages=[];

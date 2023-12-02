@@ -1,37 +1,39 @@
-import mongoose,{Schema,model,Types} from 'mongoose'
-const categorySchema=new Schema({
-    name:{
-        type:String,
-        required:true,
-        unique:true,
+import mongoose, { Schema, model, Types } from "mongoose";
+const categorySchema = new Schema(
+  {
+    name: {
+      type: String,
+      required: true,
+      unique: true,
     },
-   slug:{
-   type:String,
-   required:true,
-   },
-    image:{
-        type:Object,
-        required:true,
+    slug: {
+      type: String,
+      required: true,
     },
-    status:{
-        type:String,
-        default:'Active',
-        enum:['Active','Inactive'],
+    image: {
+      type: Object,
+      required: true,
     },
-   createdBy:{type:Types.ObjectId,ref:'User'},
-   updatedBy:{type:Types.ObjectId,ref:'User'},
-},
-{
-    timestamps:true,
-    toJSON:{virtuals:true},
-    toObject:{virtuals:true}
+    status: {
+      type: String,
+      default: "Active",
+      enum: ["Active", "Inactive"],
+    },
+    createdBy: { type: Types.ObjectId, ref: "User" },
+    updatedBy: { type: Types.ObjectId, ref: "User" },
+  },
+  {
+    timestamps: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
+  }
+);
+categorySchema.virtual("subcategory", {
+  localField: "_id",
+  foreignField: "categoryId",
+  ref: "Subcategory",
 });
-categorySchema.virtual('subcategory',{
-    localField:'_id',
-    foreignField:'categoryId',
-    ref:'Subcategory'
 
-})
-
-const categoryModel=mongoose.models.Category||model('Category',categorySchema);
+const categoryModel =
+  mongoose.models.Category || model("Category", categorySchema);
 export default categoryModel;

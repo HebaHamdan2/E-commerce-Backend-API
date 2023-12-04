@@ -10,13 +10,13 @@ const router = Router();
 router.get("/", productsController.getProducts);
 router.post(
   "/",
-  validation(validators.createProduct),
   auth(endPoint.create),
   fileUpload(fileValidation.image).fields([
     { name: "mainImage", maxCount: 1 },
     { name: "subImages", maxCount: 4 },
   ]),
-  productsController.createProduct
+  productsController.createProduct, 
+  validation(validators.createProduct)//the validation should be after adding files to make sure that validates for everything 
 );
 router.get("/category/:categoryId", productsController.getProductWithCategory);
 router.get("/:productId", productsController.getProduct);

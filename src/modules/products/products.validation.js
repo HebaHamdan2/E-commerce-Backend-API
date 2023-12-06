@@ -9,7 +9,7 @@ export const createProduct = joi
     price: joi.number().positive().required(),
     discount: joi.number().positive().min(1),
     file: joi.object({
-      minImage: joi.array().items(generalFields.file.required()).length(1),
+      mainImage: joi.array().items(generalFields.file.required()).length(1),
       subImages: joi.array().items(generalFields.file.required()).min(2).max(4),
     }),
     status: joi.string().valid("Active", "Inactive"),

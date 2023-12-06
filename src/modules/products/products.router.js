@@ -14,10 +14,9 @@ router.post(
   fileUpload(fileValidation.image).fields([
     { name: "mainImage", maxCount: 1 },
     { name: "subImages", maxCount: 4 },
-  ]),
-  productsController.createProduct, 
-  validation(validators.createProduct)//the validation should be after adding files to make sure that validates for everything 
-);
+  ]),  validation(validators.createProduct)
+  ,productsController.createProduct
+);//the validation should be after adding files to make sure that validates for everything 
 router.get("/category/:categoryId", productsController.getProductWithCategory);
 router.get("/:productId", productsController.getProduct);
 export default router;

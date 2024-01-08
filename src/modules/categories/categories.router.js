@@ -11,18 +11,13 @@ const router = Router();
 router.use("/:id/subcategory", subCategoryRouter);
 router.get(
   "/",
-  auth(Object.values(roles)),
+  auth(endPoint.getAll),
   asyncHandler(categoriesController.getCategories)
 );
-router.get(
-  "/active",
-  auth(endPoint.getActive),
-  asyncHandler(categoriesController.getActiveCategory)
-);
+router.get("/active", asyncHandler(categoriesController.getActiveCategory));
 router.get(
   "/:id",
   validation(validators.getSpecificCategory),
-  auth(endPoint.specific),
   asyncHandler(categoriesController.SpecificCategory)
 );
 router.post(
@@ -30,13 +25,18 @@ router.post(
   validation(validators.createCategory),
   auth(endPoint.create),
   fileUpload(fileValidation.image).single("image"),
-  categoriesController.createCategory
+  asyncHandler(categoriesController.createCategory)
 );
 router.put(
   "/:id",
   auth(endPoint.update),
   fileUpload(fileValidation.image).single("image"),
   asyncHandler(categoriesController.updateCategory)
+);
+router.delete(
+  "/:categoryId",
+  auth(endPoint.delete),
+  asyncHandler(categoriesController.deleteCategory)
 );
 
 export default router;

@@ -21,8 +21,7 @@ const orderSchema = new Schema(
     address: { type: String, required: true },
     phoneNumber: { type: String, required: true },
     couponName: {
-      type: String,
-      required: true,
+      type: String
     },
     paymentType: {
       type: String,

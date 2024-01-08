@@ -3,12 +3,34 @@ import categoryModel from "../../../DB/model/category.model.js";
 import subcategoryModel from "../../../DB/model/subCategory.model.js";
 import cloudinary from "../../services/cloudinary.js";
 import productModel from "../../../DB/model/product.model.js";
+import { pagination } from "../../services/pagination.js";
+export const getProducts = async(req,res)=>{
+  const {skip,limit} = pagination(req.query.page,req.query.limit);
 
-export const getProducts = async (req, res) => {
-  const products = await productModel.find({});
-  return res.json({ message: "products", products });
-};
+  let queryObj={...req.body};
+  const execQuery=['page','limit','skip','sort','search'];
+  execQuery.map((ele)=>{
+delete queryObj[ele];
 
+  });
+  queryObj=JSON.stringify(queryObj);
+  queryObj=queryObj.replace(/\b(gt|gte|lt|lte|in|nin|eq|neq)\b/g,match=>`$${match}`);
+  queryObj=JSON.parse(queryObj);
+  const mongooseQuery=productModel.find(queryObj).limit(limit).skip(skip);
+  if(req.query.search){
+    mongooseQuery.find({
+      $or:[
+        {name:{$regx:req.query.search,$options:'i'}},
+        {description:{$regx:req.query.search,$option:'i'}},
+      ]
+    })
+    mongooseQuery.select('name mainImage');
+  }
+ 
+  const products=await mongooseQuery.sort(req.query.sort?.replaceAll(',',' '));
+  const count=await productModel.estimatedDocumentCount();
+  return res.json({message:"success",page:products.length,total:count,products});
+}
 export const createProduct = async (req, res) => {
   const { name, price, discount, categoryId, subcategoryId } = req.body;
   const checkCategory = await categoryModel.findById(categoryId);

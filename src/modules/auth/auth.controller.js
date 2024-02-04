@@ -16,12 +16,7 @@ export const signUp = async (req, res, next) => {
       password,
       parseInt(process.env.SALT_ROUND)
     );
-    const { secure_url, public_id } = await cloudinary.uploader.upload(
-      req.file.path,
-      {
-        folder: `${process.env.APP_NAME}/users`,
-      }
-    );
+    
     const token = jwt.sign({ email }, process.env.CONFIRMEMAILSECRET);
     await sendEmail(
       email,
@@ -33,7 +28,6 @@ export const signUp = async (req, res, next) => {
       userName,
       email,
       password: hashedPassword,
-      image: { secure_url, public_id },
     });
     return res.status(201).json({ message: "success", createUser });
   } catch (err) {

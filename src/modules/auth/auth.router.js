@@ -5,7 +5,6 @@ import { asyncHandler } from "../../services/errorHandling.js";
 const router = Router();
 router.post(
   "/signup",
-  fileUpload(fileValidation.image).single("image"),
   asyncHandler(AuthController.signUp)
 );
 router.post("/signin", AuthController.signIn);

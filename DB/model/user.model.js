@@ -16,10 +16,6 @@ const userShema = new Schema(
       type: String,
       required: true,
     },
-    image: {
-      type: Object,
-      required: true,
-    },
     phone: {
       type: String,
     },

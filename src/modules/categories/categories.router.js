@@ -11,7 +11,6 @@ const router = Router();
 router.use("/:id/subcategory", subCategoryRouter);
 router.get(
   "/",
-  auth(endPoint.getAll),
   asyncHandler(categoriesController.getCategories)
 );
 router.get("/active", asyncHandler(categoriesController.getActiveCategory));

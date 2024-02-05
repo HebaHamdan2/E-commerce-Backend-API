@@ -10,9 +10,19 @@ import userRouter from "./user/user.router.js";
 import cors from "cors"
 import { globalErrorHandler } from "../services/errorHandling.js";
 const initApp = async (app, express) => {
+<<<<<<< HEAD
  
   app.use(cors(
   ));
+=======
+  // let whitelist=['https://apiecommerce-hblh.onrender.com']
+  // if( !whitelist.includes(req.header('origin'))){
+  //   return next(new Error(`invalid`,{cause:403}))
+  // }else{
+  //   next()
+  // }
+  // app.use(cors());
+>>>>>>> 1d4acf9198fcb6e865671752b4d73b94c67786fb
   connectDB();
   app.use(express.json());
   app.get("/", (req, res) => {

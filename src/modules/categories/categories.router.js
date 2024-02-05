@@ -21,9 +21,8 @@ router.get(
 );
 router.post(
   "/",
-  validation(validators.createCategory),
   auth(endPoint.create),
-  fileUpload(fileValidation.image).single("image"),
+  fileUpload(fileValidation.image).single("image"),validation(validators.createCategory),
   asyncHandler(categoriesController.createCategory)
 );
 router.put(

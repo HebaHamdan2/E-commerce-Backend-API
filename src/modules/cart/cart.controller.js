@@ -14,7 +14,12 @@ export const createCart = async (req, res) => {
   let matchedProduct = false;
   for (let i = 0; i < cart.products.length; i++) {
     if (cart.products[i].productId == productId) {
-      cart.products[i].quantity = quantity;
+      if(req.body.quantity){
+        cart.products[i].quantity = quantity;
+      }else{
+        cart.products[i].quantity+=1;
+      }
+      
       matchedProduct = true;
       break;
     }

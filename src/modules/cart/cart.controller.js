@@ -1,9 +1,10 @@
 import cartModel from "../../../DB/model/cart.model.js";
+import productModel from "../../../DB/model/product.model.js";
 
 export const createCart = async (req, res) => {
   const { productId } = req.body;
   const quantity=req.body.quantity || 1;
-  const cart = await cartModel.findOne({ userId: req.user._id });
+  const cart = await cartModel.findOne({ userId: req.user._id })
   if (!cart) {
     const newCart = await cartModel.create({
       userId: req.user._id,
@@ -54,6 +55,6 @@ export const clearCart = async (req, res) => {
   return res.status(200).json({ message: "success" });
 };
 export const getCart = async (req, res) => {
-  const cart = await cartModel.findOne({ userId: req.user._id });
+  const cart = await cartModel.findOne({ userId: req.user._id }).populate("products.productId");
   return res.status(200).json({ message: "success", cart: cart });
 };

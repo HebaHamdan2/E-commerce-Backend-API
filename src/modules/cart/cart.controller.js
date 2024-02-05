@@ -1,7 +1,8 @@
 import cartModel from "../../../DB/model/cart.model.js";
 
 export const createCart = async (req, res) => {
-  const { productId, quantity } = req.body;
+  const { productId } = req.body;
+  const quantity=req.body.quantity || 1;
   const cart = await cartModel.findOne({ userId: req.user._id });
   if (!cart) {
     const newCart = await cartModel.create({

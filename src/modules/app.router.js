@@ -7,15 +7,12 @@ import couponRouter from "./coupon/coupon.router.js";
 import cartRouter from "./cart/cart.router.js";
 import orderRouter from "./order/order.router.js";
 import userRouter from "./user/user.router.js";
+import cors from "cors"
 import { globalErrorHandler } from "../services/errorHandling.js";
 const initApp = async (app, express) => {
-  let whitelist=['https://apiecommerce-hblh.onrender.com']
-  if( !whitelist.includes(req.header('origin'))){
-    return next(new Error(`invalid`,{cause:403}))
-  }else{
-    next()
-  }
-  app.use(cors());
+ 
+  app.use(cors(
+  ));
   connectDB();
   app.use(express.json());
   app.get("/", (req, res) => {

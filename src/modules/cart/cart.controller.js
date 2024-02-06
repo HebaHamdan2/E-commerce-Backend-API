@@ -58,3 +58,16 @@ export const getCart = async (req, res) => {
   const cart = await cartModel.findOne({ userId: req.user._id }).populate("products.productId");
   return res.status(200).json({ message: "success", cart: cart });
 };
+export const updateCart =async (req,res)=>{
+const{productId}=req.params;
+const{quantity}=req.body;
+const cart = await cartModel.findOne({userId:req.user._id});
+for(const product of cart.products){
+  if(product.productId==productId){
+    product.quantity=quantity;
+  }
+}
+await cart.save();
+return res.status(200).json({message:"success",cart});
+
+}

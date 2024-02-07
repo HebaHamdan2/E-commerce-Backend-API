@@ -34,7 +34,7 @@ export const signUp = async (req, res, next) => {
     return res.json({ message: "error", err: err.stack });
   }
 };
-export const signIn = async (req, res) => {
+export const signIn = async (req, res,next) => {
   const { email, password } = req.body;
   const user = await userModel.findOne({ email });
   if (!user) {
@@ -46,7 +46,7 @@ export const signIn = async (req, res) => {
 
   const match = await bcrypt.compare(password, user.password);
   if (!match) {
-    return res.status(200).json({ message: "success", user });
+    return next(new Error(`mismatch password`,{cause:401}));
   }
   const token = jwt.sign(
     { id: user._id, role: user.role, status: user.status },

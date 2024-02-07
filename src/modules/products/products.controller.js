@@ -31,15 +31,15 @@ delete queryObj[ele];
   const count=await productModel.estimatedDocumentCount();
   return res.json({message:"success",page:products.length,total:count,products});
 }
-export const createProduct = async (req, res) => {
+export const createProduct = async (req, res,next) => {
   const { name, price, discount, categoryId, subcategoryId } = req.body;
   const checkCategory = await categoryModel.findById(categoryId);
   if (!checkCategory) {
-    return res.status(404).json({ message: "category not found" });
+    return next(new Error(`category not found`,{cause:404}));
   }
   const checksubCategory = await subcategoryModel.findById(subcategoryId);
   if (!checksubCategory) {
-    return res.status(404).json({ message: "sub category not found" });
+    return next(new Error(`sub category not found`,{cause:404}));
   }
   req.body.slug = slugify(name);
   req.body.finalPrice = price - ((price * (discount || 0)) / 100).toFixed(2);
@@ -60,7 +60,7 @@ export const createProduct = async (req, res) => {
   req.body.updatedBy = req.user._id;
   const product = await productModel.create(req.body);
   if (!product) {
-    return res.status(400).json({ message: "error while creating product" });
+    return next(new Error(`error while creating product`,{cause:400}));
   }
   return res.status(201).json({ message: "success", product });
 };

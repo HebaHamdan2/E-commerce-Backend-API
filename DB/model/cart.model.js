@@ -13,6 +13,9 @@ const cartSchema = new Schema(
         quantity: { type: Number, default: 1 },
       },
     ],
+    count:{
+      type:Number,default:1
+    }
   },
   {
     timestamps: true,

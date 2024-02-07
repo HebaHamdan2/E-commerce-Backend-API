@@ -1,14 +1,20 @@
 import cartModel from "../../../DB/model/cart.model.js";
 import productModel from "../../../DB/model/product.model.js";
 
-export const createCart = async (req, res) => {
+export const createCart = async (req, res,next) => {
   const { productId } = req.body;
   const quantity=req.body.quantity || 1;
+
   const cart = await cartModel.findOne({ userId: req.user._id })
+  const product=await productModel.findById(productId);
+  if(product.stock<quantity){
+    return next(new Error("product quantity not available"))
+  }
   if (!cart) {
     const newCart = await cartModel.create({
       userId: req.user._id,
       products: { productId, quantity },
+      count:quantity
     });
     return res.status(201).json({ message: "success", newCart });
   }
@@ -19,12 +25,23 @@ export const createCart = async (req, res) => {
         cart.products[i].quantity = quantity;
       }else{
         cart.products[i].quantity+=1;
+       
       }
-      
+      if(product.stock<cart.products[i].quantity){
+        return next(new Error("product quantity not available"))
+      }
       matchedProduct = true;
       break;
     }
   }
+  let count=0;
+  for (let i = 0; i < cart.products.length; i++) {
+   
+        count+=cart.products[i].quantity;
+           
+  }
+  cart.count=count;
+
   if (!matchedProduct) {
     cart.products.push({ productId, quantity });
   }

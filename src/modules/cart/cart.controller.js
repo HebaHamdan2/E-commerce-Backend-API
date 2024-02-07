@@ -83,7 +83,15 @@ for(const product of cart.products){
   if(product.productId==productId){
     product.quantity=quantity;
   }
+ 
 }
+let count=0;
+for (let i = 0; i < cart.products.length; i++) {
+ 
+      count+=cart.products[i].quantity;
+         
+}
+cart.count=count;
 await cart.save();
 return res.status(200).json({message:"success",cart});
 

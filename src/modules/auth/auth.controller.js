@@ -84,8 +84,8 @@ export const sendCode = async (req, res) => {
   );
   const html = `<h2>code is :${code}</h2>`;
   await sendEmail(email, `reset password`, html);
-  return res.redirect(process.env.FORGETPASSWORDFORM); //redirecet to the  forume  for making new password
-  //   return res.status(200).json({message:"success",user});
+ // return res.redirect(process.env.FORGETPASSWORDFORM); //redirecet to the  forume  for making new password
+  return res.status(200).json({message:"success",user});
 };
 export const forgetPasseword = async (req, res) => {
   const { email, password, code } = req.body;

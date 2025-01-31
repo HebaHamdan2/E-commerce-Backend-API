@@ -6,12 +6,14 @@ import productModel from "../../../DB/model/product.model.js";
 import subcategoryModel from "../../../DB/model/subCategory.model.js";
 export const getCategories = async (req, res) => {
   const { skip, limit } = pagination(req.query.page, req.query.limit);
+  const totalCategories = await categoryModel.countDocuments();
+
   const categories = await categoryModel
     .find()
     .skip(skip)
     .limit(limit)
     .populate("subcategory");
-  return res.status(200).json({ message: "success", categories });
+  return res.status(200).json({ message: "success", categories,totalCategories });
 };
 export const getActiveCategory = async (req, res) => {
   const { skip, limit } = pagination(req.query.page, req.query.limit);

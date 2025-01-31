@@ -63,7 +63,7 @@ export const updateCategory = async (req, res, next) => {
   }
   if (
     await categoryModel
-      .findOne({ name: req.body.name, _id: { $ne: category._id } })
+      .findOne({ name: req.body.name, _id: { $ne:category._id} })
       .select("name")
   ) {
     return next(

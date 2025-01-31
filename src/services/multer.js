@@ -1,8 +1,8 @@
 import multer from "multer";
 export const fileValidation = {
-  image: ["image/png", "image/jpeg", "image/webp"],
+  image: ["image/png", "image/jpeg", "image/webp","image/svg+xml"],
   pdf: ["application/pdf"],
-   excel:["application/vnd.openxmlformats-officedocument.wordprocessingml.document"]
+  excel:["application/vnd.openxmlformats-officedocument.wordprocessingml.document"]
 };
 function fileUpload(customValidation = []) {
   const storage = multer.diskStorage({});

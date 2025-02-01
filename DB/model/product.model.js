@@ -43,12 +43,26 @@ const productSchema = new Schema(
       enum: ["Active", "Inactive"],
     },
     isDeleted: { type: Boolean, default: false },
-    colors: [String],
-    sizes: [{ type: String, enum: ["s", "m", "lg", "xl"] }],
+    variants: [
+      {
+        color: { type: String, required: true },
+        size: { type: String, enum: ["s", "m", "lg", "xl"], required: true },
+        stock: { type: Number, required: true }, // stock for the color/size combination
+      }],
     categoryId: { type: Types.ObjectId, ref: "Category", required: true },
     subcategoryId: { type: Types.ObjectId, ref: "Subcategory", required: true },
     createdBy: { type: Types.ObjectId, ref: "User", required: true },
     updatedBy: { type: Types.ObjectId, ref: "User", required: true },
+    avgRating: { // average rating for the product
+      type: Number,
+      default: 0,
+      min: 0,
+      max: 5,
+    },
+    numberOfRatings: { // number of ratings for the product
+      type: Number,
+      default: 0,
+    },
   },
   {
     timestamps: true,

@@ -46,7 +46,7 @@ const productSchema = new Schema(
     variants: [
       {
         color: { type: String, required: true },
-        size: { type: String, enum: ["s", "m", "lg", "xl"], required: true },
+        size: { type: String, enum: ["S", "M", "L", "XL"], required: true },
         stock: { type: Number, required: true }, // stock for the color/size combination
       }],
     categoryId: { type: Types.ObjectId, ref: "Category", required: true },

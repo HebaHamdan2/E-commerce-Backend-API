@@ -1,7 +1,6 @@
 import slugify from "slugify";
 import categoryModel from "../../../DB/model/category.model.js";
 import subcategoryModel from "../../../DB/model/subCategory.model.js";
-import cloudinary from "../../services/cloudinary.js";
 
 export const createsubCategory=async(req,res,next)=>{
 const{name,categoryId}=req.body;

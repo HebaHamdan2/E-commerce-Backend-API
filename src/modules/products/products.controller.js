@@ -57,6 +57,9 @@ export const getProducts = async (req, res) => {
 
 export const createProduct = async (req, res, next) => {
   const { name, price, discount, categoryId, subcategoryId, variants } = req.body;
+  if (!Array.isArray(variants) || variants.length === 0) {
+    return next(new Error('Variants must be an array and cannot be empty.'));
+  }
 
   // Validation for variants
   if (!variants || variants.length === 0) {

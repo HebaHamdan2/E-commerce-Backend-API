@@ -36,21 +36,6 @@ export const getProducts = async (req, res) => {
 
   const products = await mongooseQuery.sort(req.query.sort?.replaceAll(',', ' '));
 
-  // Calculate avgRating and numberOfRatings for each product
-  for (const product of products) {
-    let totalRatings = 0;
-    let ratingCount = product.reviews.length;
-
-    if (ratingCount > 0) {
-      totalRatings = product.reviews.reduce((acc, review) => acc + review.rating, 0);
-      product.avgRating = totalRatings / ratingCount;
-      product.numberOfRatings = ratingCount;
-    } else {
-      product.avgRating = 0;
-      product.numberOfRatings = 0;
-    }
-  }
-
   const count = await productModel.estimatedDocumentCount();
   return res.json({ message: 'success', page: products.length, total: count, products });
 };
@@ -121,21 +106,6 @@ export const getProductWithCategory = async (req, res) => {
     .find({ categoryId: req.params.categoryId })
     .populate('reviews');
 
-  // Calculate avgRating and numberOfRatings for each product
-  for (const product of products) {
-    let totalRatings = 0;
-    let ratingCount = product.reviews.length;
-
-    if (ratingCount > 0) {
-      totalRatings = product.reviews.reduce((acc, review) => acc + review.rating, 0);
-      product.avgRating = totalRatings / ratingCount;
-      product.numberOfRatings = ratingCount;
-    } else {
-      product.avgRating = 0;
-      product.numberOfRatings = 0;
-    }
-  }
-
   return res.status(200).json({ message: 'success', products });
 };
 
@@ -143,19 +113,5 @@ export const getProduct = async (req, res) => {
   const product = await productModel
     .findById(req.params.productId)
     .populate('reviews');
-
-  // Calculate avgRating and numberOfRatings for this product
-  let totalRatings = 0;
-  let ratingCount = product.reviews.length;
-
-  if (ratingCount > 0) {
-    totalRatings = product.reviews.reduce((acc, review) => acc + review.rating, 0);
-    product.avgRating = totalRatings / ratingCount;
-    product.numberOfRatings = ratingCount;
-  } else {
-    product.avgRating = 0;
-    product.numberOfRatings = 0;
-  }
-
   return res.status(200).json({ message: 'success', product });
 };

@@ -46,8 +46,8 @@ const productSchema = new Schema(
     variants: [
       {
         color: { type: String, required: true },
-        size: { type: String, enum: ["S", "M", "L", "XL"], required: true },
-        stock: { type: Number, required: true }, // stock for the color/size combination
+        size: { type: String, enum: ["All","S", "M", "L", "XL"], required: true },
+        stockPerOne: { type: Number, required: true },
       }],
     categoryId: { type: Types.ObjectId, ref: "Category", required: true },
     subcategoryId: { type: Types.ObjectId, ref: "Subcategory", required: true },
@@ -68,6 +68,13 @@ const productSchema = new Schema(
     timestamps: true,
   }
 );
+// Adding a virtual to populate reviews when fetching product
+productSchema.virtual('reviews', {
+  ref: 'Review',
+  localField: '_id',
+  foreignField: 'productId',
+  justOne: false, // Set to false to populate multiple reviews
+});
 
 const productModel = mongoose.models.Product || model("Product", productSchema);
 export default productModel;

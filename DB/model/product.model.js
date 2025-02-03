@@ -45,22 +45,12 @@ const productSchema = new Schema(
     isDeleted: { type: Boolean, default: false },
     variants: [
       {
-        // The color can either be a specific color or null if there's no color option
-        color: { type: String, default: null }, 
-    
-        // Size can either be a specific size or 'All' (if no size differentiation is needed)
-        size: { 
-          type: String, 
-          enum: ["All", "S", "M", "L", "XL"], 
-          default: "All"  
-        },
-    
-        stockPerOne: { 
-          type: Number, 
-          required: true 
-        },
+        color: { type: String, default: null },
+        size: { type: String, enum: ["All", "S", "M", "L", "XL"], default: "All" },
+        stockPerOne: { type: Number, required: true },
       }
-    ],    
+    ]
+,    
     categoryId: { type: Types.ObjectId, ref: "Category", required: true },
     subcategoryId: { type: Types.ObjectId, ref: "Subcategory", required: true },
     createdBy: { type: Types.ObjectId, ref: "User", required: true },

@@ -41,22 +41,30 @@ export const getProducts = async (req, res) => {
 };
 
 export const createProduct = async (req, res, next) => {
-  const { name, price, discount, categoryId, subcategoryId, variants } = req.body;
-  if (!Array.isArray(variants) || variants.length === 0) {
-    return next(new Error('Variants must be an array and cannot be empty.'));
-  }
+  let { name, price, discount, categoryId, subcategoryId, variants } = req.body;
 
-  // Validation for variants
-  if (!variants || variants.length === 0) {
-    return next(new Error("Product must have at least one variant (color/size).", { cause: 400 }));
+  // Check if variants is passed as a string and parse it into an array
+  if (typeof variants === "string") {
+    try {
+      variants = JSON.parse(variants); // Parse the stringified JSON into an actual array
+    } catch (error) {
+      return next(new Error("Invalid format for variants. Unable to parse JSON.", { cause: 400 }));
+    }
   }
+if (!Array.isArray(variants) || variants.length === 0) {
+  return next(new Error('Variants must be an array and cannot be empty.', { cause: 400 }));
+}
 
-  variants.forEach(variant => {
-    if (!variant.color || !variant.size || !variant.stock) {
-      return next(new Error("Each variant must have color, size, and stock.", { cause: 400 }));
+// Validate each variant to ensure stockPerOne is present
+variants.forEach(variant => {
+  if (variant.stockPerOne === undefined || variant.stockPerOne < 0) {
+    return next(new Error("Each variant must have a valid stock quantity (stockPerOne).", { cause: 400 }));
+  }
+    // If a size or color is provided, ensure it's valid
+    if (variant.size && !["All", "S", "M", "L", "XL"].includes(variant.size)) {
+      return next(new Error("Size must be one of 'All', 'S', 'M', 'L', 'XL'.", { cause: 400 }));
     }
   });
-
   const checkCategory = await categoryModel.findById(categoryId);
   if (!checkCategory) {
     return next(new Error(`Category not found`, { cause: 404 }));
@@ -87,18 +95,27 @@ export const createProduct = async (req, res, next) => {
 
   req.body.createdBy = req.user._id;
   req.body.updatedBy = req.user._id;
+    // Set default status and isDeleted flag
+    req.body.status = req.body.status || "Active";
+    req.body.isDeleted = req.body.isDeleted || false;
+  
 
   // Set initial values for avgRating and numberOfRatings
   req.body.avgRating = 0;
   req.body.numberOfRatings = 0;
-  req.body.variants = variants; // Adding variants here
+  req.body.variants = variants;
+  req.body.stock = variants.reduce((total, variant) => total + variant.stockPerOne, 0);
+  try {
+    const product = await productModel.create(req.body);
+    if (!product) {
+      return next(new Error(`Error while creating product`, { cause: 400 }));
+    }
 
-  const product = await productModel.create(req.body);
-  if (!product) {
-    return next(new Error(`Error while creating product`, { cause: 400 }));
+    // Return the created product with a success message
+    return res.status(201).json({ message: 'Product created successfully', product });
+  } catch (error) {
+    return next(new Error(`Error while creating product: ${error.message}`, { cause: 500 }));
   }
-
-  return res.status(201).json({ message: 'success', product });
 };
 
 export const getProductWithCategory = async (req, res) => {

@@ -10,6 +10,8 @@ const cartSchema = new Schema(
     products: [
       {
         productId: { type: Types.ObjectId, ref: "Product", required: true },
+        color: { type: String, default: null },
+        size: { type: String, enum: ["All", "S", "M", "L", "XL"], default: "All" },
         quantity: { type: Number, default: 1 },
       },
     ],

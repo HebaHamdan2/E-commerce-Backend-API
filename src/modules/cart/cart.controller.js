@@ -3,8 +3,6 @@ import productModel from "../../../DB/model/product.model.js";
 
 export const createCart = async (req, res, next) => {
   const { productId, quantity = 1, color, size } = req.body;
-
-  // Fetch the cart and product
   const cart = await cartModel.findOne({ userId: req.user._id });
   const product = await productModel.findById(productId);
 
@@ -12,16 +10,15 @@ export const createCart = async (req, res, next) => {
     return next(new Error("Product not found", { cause: 404 }));
   }
 
-  // Check if the requested quantity is available in stock for the selected color and size
   const selectedVariant = product.variants.find(
-    (variant) => variant.color === color && variant.size === size
+    (variant) => variant.color === color &&  variant.size === size
   );
+if(!selectedVariant){
+  return next(new Error("Product not found",{ cause: 404 }));
 
-  if (!selectedVariant) {
-    return next(new Error("Selected color and size combination not found"));
-  }
+}
 
-  if (selectedVariant.stock < quantity) {
+  if (selectedVariant.stockPerOne < quantity) {
     return next(new Error("Product quantity not available for this variant"));
   }
 
@@ -45,7 +42,7 @@ export const createCart = async (req, res, next) => {
     ) {
       // Update the product quantity
       cart.products[i].quantity += quantity;
-      if (selectedVariant.stock < cart.products[i].quantity) {
+      if (selectedVariant.stockPerOne < cart.products[i].quantity) {
         return next(new Error("Product quantity not available for this variant"));
       }
       matchedProduct = true;
@@ -66,21 +63,24 @@ export const createCart = async (req, res, next) => {
   return res.status(200).json({ message: "Cart updated successfully", cart });
 };
 
-
 export const removeItem = async (req, res) => {
-  const { productId } = req.body;
+  const { productId, color, size } = req.body; // Ensure you're also getting color and size
+
   await cartModel.updateOne(
     { userId: req.user._id },
     {
       $pull: {
         products: {
           productId,
+          color,
+          size,
         },
       },
     }
   );
   return res.status(200).json({ message: "success" });
 };
+
 export const clearCart = async (req, res) => {
   const clearCart = await cartModel.updateOne(
     { userId: req.user._id },
@@ -88,10 +88,10 @@ export const clearCart = async (req, res) => {
   );
   return res.status(200).json({ message: "success" });
 };
+
 export const getCart = async (req, res) => {
   const cart = await cartModel
     .findOne({ userId: req.user._id })
-    .populate("products.productId"); // Make sure this is correctly populated
 
   return res.status(200).json({ message: "Success", cart });
 };
@@ -118,7 +118,7 @@ export const updateCart = async (req, res, next) => {
     (variant) => variant.color === color && variant.size === size
   );
 
-  if (selectedVariant && selectedVariant.stock < quantity) {
+  if (selectedVariant && selectedVariant.stockPerOne < quantity) {
     return next(new Error("Product quantity not available for this variant"));
   }
 

@@ -2,7 +2,7 @@ import orderModel from "../../../DB/model/order.model.js";
 import productModel from "../../../DB/model/product.model.js";
 import reviewModel from "../../../DB/model/review.model.js";
 
-export const create = async (req, res, next) => {
+export const createReview = async (req, res, next) => {
   const { productId } = req.params;
   const { comment, rating } = req.body;
 
@@ -12,6 +12,8 @@ export const create = async (req, res, next) => {
     status: "delivered",
     "products.productId": productId,
   });
+  
+ 
   if (!order) {
     return next(new Error("Cannot review this product", { cause: 400 }));
   }
@@ -54,3 +56,13 @@ export const create = async (req, res, next) => {
 
   return res.status(201).json({ message: "Success", review });
 };
+export const getAllreviews=async(req,res,next)=>{
+  const reviews=await reviewModel.find({ createdBy: req.user._id})
+if(!reviews){
+  return next(new Error(`you did not review anything yet`, { cause: 400 }));
+
+}
+return res.status(200).json({ message: "Success", reviews });
+
+
+}

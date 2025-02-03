@@ -8,7 +8,7 @@ export const createOrder = async (req, res, next) => {
   const { couponName } = req.body;
   const cart = await cartModel.findOne({ userId: req.user._id });
 
-  if (!cart) {
+  if (!cart||cart.products.length===0) {
     return next(new Error(`Cart is empty`, { cause: 400 }));
   }
 
@@ -35,7 +35,7 @@ export const createOrder = async (req, res, next) => {
 
   // Loop through the products in the cart and validate stock
   for (let product of req.body.products) {
-    const { productId, quantity, variantColor, variantSize } = product;
+    const { productId, quantity, color, size } = product;
 
     const checkProduct = await productModel.findOne({ _id: productId });
     if (!checkProduct) {
@@ -44,7 +44,7 @@ export const createOrder = async (req, res, next) => {
 
     // Find the specific variant (color/size combination) in the product
     const variant = checkProduct.variants.find(
-      (v) => v.color === variantColor && v.size === variantSize
+      (v) => v.color === color && v.size === size
     );
 
     if (!variant) {
@@ -52,7 +52,7 @@ export const createOrder = async (req, res, next) => {
     }
 
     // Check if enough stock is available for this variant
-    if (variant.stock < quantity) {
+    if (variant.stockPerOne < quantity) {
       return next(new Error(`Not enough stock for the selected variant`, { cause: 400 }));
     }
 
@@ -88,19 +88,19 @@ export const createOrder = async (req, res, next) => {
 
   // Decrease stock for each product variant in the order
   for (let product of req.body.products) {
-    const { productId, quantity, variantColor, variantSize } = product;
+    const { productId, quantity, color, size } = product;
 
     // Find the product and its variant
     const productInDb = await productModel.findOne({ _id: productId });
     const variant = productInDb.variants.find(
-      (v) => v.color === variantColor && v.size === variantSize
+      (v) => v.color === color && v.size === size
     );
 
     // Update stock for the selected variant
     if (variant) {
       await productModel.updateOne(
-        { _id: productId, "variants.color": variantColor, "variants.size": variantSize },
-        { $inc: { "variants.$.stock": -quantity } }
+        { _id: productId, "variants.color": color, "variants.size": size },
+        { $inc: { "variants.$.stockPerOne": -quantity } }
       );
     }
   }
@@ -147,7 +147,7 @@ export const cancelOreder = async (req, res, next) => {
     if (variant) {
       await productModel.updateOne(
         { _id: productId, "variants.color": variantColor, "variants.size": variantSize },
-        { $inc: { "variants.$.stock": quantity } }
+        { $inc: { "variants.$.stockPerOne": quantity } }
       );
     }
   }
@@ -186,7 +186,7 @@ export const changeStatus = async (req, res, next) => {
       if (variant) {
         await productModel.updateOne(
           { _id: productId, "variants.color": variantColor, "variants.size": variantSize },
-          { $inc: { "variants.$.stock": quantity } }
+          { $inc: { "variants.$.stockPerOne": quantity } }
         );
       }
     }

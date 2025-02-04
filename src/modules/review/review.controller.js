@@ -75,27 +75,20 @@ export const deleteReview = async (req, res, next) => {
     if (!review) {
       return res.status(404).json({ message: "Review not found" });
     }
-
-    // Find the product associated with the review
     const product = await productModel.findById(review.productId);
 
     if (!product) {
       return res.status(404).json({ message: "Product not found" });
     }
-
-    // Calculate the new average rating and number of ratings
     const totalRatings = product.numberOfRatings - 1;
 
     if (totalRatings > 0) {
-      // Weighted average calculation for remaining ratings
       const newAvgRating =
         (product.avgRating * product.numberOfRatings - review.rating) / totalRatings;
 
-      // Update the product's average rating and number of ratings
       product.avgRating = newAvgRating;
       product.numberOfRatings = totalRatings;
     } else {
-      // If no ratings remain, reset the average rating and number of ratings
       product.avgRating = 0;
       product.numberOfRatings = 0;
     }
@@ -106,7 +99,48 @@ export const deleteReview = async (req, res, next) => {
 
     return res.status(200).json({ message: "Review deleted successfully" });
   } catch (error) {
-    console.error(error);
     return res.status(500).json({ message: "Server error" });
   }
 };
+export const updateReview = async (req, res, next) => {
+  const review = await reviewModel.findOne({
+    _id: req.params.reviewId,
+    createdBy: req.user._id
+  });
+
+  if (!review) {
+    return next(new Error("Review not found or you're not authorized to edit it.", { cause: 404 }));
+  }
+
+  if (req.body.comment) {
+    await reviewModel.updateOne(
+      { _id: req.params.reviewId, createdBy: req.user._id },
+      { $set: { comment: req.body.comment } }
+    );
+  }
+
+  if (req.body.rating) {
+    const product = await productModel.findById(review.productId);
+    if (!product) {
+      return next(new Error("Product not found", { cause: 404 }));
+    }
+
+    const totalRatings = product.numberOfRatings;
+    const oldRating = review.rating;
+
+    const newAvgRating = (product.avgRating * totalRatings - oldRating + req.body.rating) / totalRatings;
+
+    // Update the product's average rating
+    product.avgRating = newAvgRating;
+    await product.save();
+
+    // Update the review's rating
+    await reviewModel.updateOne(
+      { _id: req.params.reviewId, createdBy: req.user._id },
+      { $set: { rating: req.body.rating } }
+    );
+  }
+
+  return res.status(200).json({ message: "Review updated successfully" });
+};
+

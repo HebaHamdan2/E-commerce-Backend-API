@@ -18,7 +18,7 @@ export const getProducts = async (req, res) => {
   queryObj = JSON.parse(queryObj);
 
   // Build the base query
-  let mongooseQuery = productModel.find(queryObj).limit(limit).skip(skip);
+  let mongooseQuery = productModel.find(queryObj).limit(limit).skip(skip).populate('reviews');;
 
   // Search functionality
   if (req.query.search) {
@@ -31,8 +31,6 @@ export const getProducts = async (req, res) => {
     mongooseQuery.select('name mainImage');
   }
 
-  // Populate reviews and calculate the average rating & number of reviews
-  mongooseQuery = mongooseQuery.populate('reviews');
 
   const products = await mongooseQuery.sort(req.query.sort?.replaceAll(',', ' '));
 

@@ -68,15 +68,18 @@ const productSchema = new Schema(
   },
   {
     timestamps: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
   }
 );
 // Adding a virtual to populate reviews when fetching product
-productSchema.virtual('reviews', {
-  ref: 'Review',
-  localField: '_id',
-  foreignField: 'productId',
-  justOne: false, // Set to false to populate multiple reviews
+productSchema.virtual("reviews", {
+  localField: "_id",
+  foreignField: "productId",
+  ref: "Review",
+  justOne:false
 });
+
 
 const productModel = mongoose.models.Product || model("Product", productSchema);
 export default productModel;

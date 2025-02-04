@@ -100,10 +100,18 @@ export const createOrder = async (req, res, next) => {
     if (variant) {
       await productModel.updateOne(
         { _id: productId, "variants.color": color, "variants.size": size },
-        { $inc: { "variants.$.stockPerOne": -quantity } }
+        { $inc: { "variants.$.stockPerOne": -quantity },
+        $addToSet: { buyers: req.user._id }  // Add user to the buyers list
+         }
+       
       );
-    }
-  }
+    
+  await productModel.updateOne(
+    { _id: productId },
+    { $set: { number_sellers: productInDb.buyers.length } }
+  );
+}
+}
 
   // Update coupon usage if applicable
   if (req.body.coupon) {
@@ -137,17 +145,20 @@ export const cancelOreder = async (req, res, next) => {
 
   // Restore stock for each product variant
   for (const product of order.products) {
-    const { productId, quantity, variantColor, variantSize } = product;
+    const { productId, quantity, color, size } = product;
     
     const productInDb = await productModel.findOne({ _id: productId });
     const variant = productInDb.variants.find(
-      (v) => v.color === variantColor && v.size === variantSize
+      (v) => v.color === color && v.size === size
     );
     
     if (variant) {
       await productModel.updateOne(
-        { _id: productId, "variants.color": variantColor, "variants.size": variantSize },
-        { $inc: { "variants.$.stockPerOne": quantity } }
+        { _id: productId, "variants.color": color, "variants.size": size },
+        { 
+          $inc: { "variants.$.stockPerOne": quantity },  // Restore stock
+          $pull: { buyers: req.user._id }  // Remove user from buyers list
+        }
       );
     }
   }
@@ -176,18 +187,23 @@ export const changeStatus = async (req, res, next) => {
 
   if (req.body.status === "cancelled") {
     for (const product of order.products) {
-      const { productId, quantity, variantColor, variantSize } = product;
+      const { productId, quantity, color, size } = product;
       
       const productInDb = await productModel.findOne({ _id: productId });
       const variant = productInDb.variants.find(
-        (v) => v.color === variantColor && v.size === variantSize
+        (v) => v.color === color && v.size === size
       );
       
       if (variant) {
         await productModel.updateOne(
-          { _id: productId, "variants.color": variantColor, "variants.size": variantSize },
+          { _id: productId, "variants.color": color, "variants.size": size },
           { $inc: { "variants.$.stockPerOne": quantity } }
         );
+        await productModel.updateOne(
+          { _id: productId },
+          { $set: { number_sellers: productInDb.buyers.length } }
+        );
+      
       }
     }
 

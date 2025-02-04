@@ -65,6 +65,8 @@ const productSchema = new Schema(
       type: Number,
       default: 0,
     },
+    buyers: [{ type: Types.ObjectId, ref: "User" }], //  users who bought the product
+
   },
   {
     timestamps: true,
@@ -72,6 +74,10 @@ const productSchema = new Schema(
     toObject: { virtuals: true },
   }
 );
+productSchema.pre('save', function(next) {
+  this.number_sellers = this.buyers.length; // Count the number of unique buyers
+  next();
+});
 // Adding a virtual to populate reviews when fetching product
 productSchema.virtual("reviews", {
   localField: "_id",

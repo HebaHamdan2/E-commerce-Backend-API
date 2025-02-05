@@ -52,14 +52,42 @@ This repository contains the backend for an e-commerce application built using *
 
 You can use the Postman collection for testing the API. The collection includes all the endpoints listed above with examples for each request.
 
-- **Postman Collection URL**: [E-commerce Backend Postman Collection](https://documenter.getpostman.com/view/28559046/2s9YRB4D3y) 
+- **Postman Collection URL**: [here](https://documenter.getpostman.com/view/28559046/2s9YRB4D3y) 
 
 ---
+## Setup Instructions
 
-## Environment Variables
-
-Create a `.env` file with the following configuration:
-
+### 1. Clone the Repository
+```bash
+git clone https://github.com/HebaHamdan2/Draw-Insight-backend.git
+cd Draw-Insight-backend
+```
+### 2. Install Dependencies
+```bash
+npm install
+```
+### 3. Environment Variables
+ - Create a .env file in the root directory and set the following variables
+```bash
+DB="mongodb://your-database-uri"
+cloud_name="your-cloudinary-cloud-name"
+api_key="your-cloudinary-api-key"
+api_secret="your-cloudinary-api-secret"
+APP_NAME="your-app-name"
+SALT_ROUND=10
+LOGINSECRET="your-jwt-secret"
+BEARERKEY="your-bearer-key"
+CONFIRMEMAILSECRET="your-confirm-email-secret"
+EMAILSENDER="your-email-sender-address"
+PASSWORDSENDER="your-password-sender-email"
+FORGETPASSWORDFORM="your-forget-password-form-link"
+LOGINFRONTEND="your-frontend-login-url"
+```
+### 4. Run the Server
+ - Start the server in development mode:
+```bash
+npm run dev
+```
 
 ## Deployment
 
@@ -70,9 +98,6 @@ This backend is deployed on **Render**. To deploy it yourself:
 3. Set up environment variables in the Render dashboard.
 4. Deploy the application.
 
----
+## Contributing
 
-## Installation
-
-1. Clone the repository:
-   ```bash
+Contributions are welcome! Please feel free to create an issue or submit a pull request for enhancements or bug fixes.

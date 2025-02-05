@@ -17,13 +17,13 @@ export const signUp = async (req, res, next) => {
       parseInt(process.env.SALT_ROUND)
     );
     
-    const token = jwt.sign({ email }, process.env.CONFIRMEMAILSECRET);
-    await sendEmail(
-      email,
-      "confirm email",
-      `<a href=''>verify</a>`
-    );
-
+ 
+const token = jwt.sign({ email }, process.env.CONFIRMEMAILSECRET);
+await sendEmail(
+  email,
+  "confirm email",
+  `<a href='${req.protocol}://${req.headers.host}/auth/confirmEmail/${token}'>verify</a>`
+);
     const createUser = await userModel.create({
       userName,
       email,
@@ -41,7 +41,7 @@ export const signIn = async (req, res,next) => {
     return res.status(400).json({ message: "data invalid" });
   }
   if (!user.confirmEmail) {
-    return res.status(400).json({ message: "plz confirm your email" });
+    return res.status(400).json({ message: "Confirm your email" });
   }
 
   const match = await bcrypt.compare(password, user.password);
@@ -72,6 +72,7 @@ export const confirmEmail = async (req, res) => {
   if (!user) {
     return res.redirect(process.env.LOGINFRONTEND);
   }
+  return res.status(200).json({ message: "email confirmed successfully" });
 };
 export const sendCode = async (req, res) => {
   const { email } = req.body;

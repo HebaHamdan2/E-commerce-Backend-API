@@ -60,7 +60,7 @@ You can use the Postman collection for testing the API. The collection includes 
 ### 1. Clone the Repository
 ```bash
 git clone https://github.com/HebaHamdan2/Draw-Insight-backend.git
-cd Draw-Insight-backend
+cd E-commerce-Backend-API
 ```
 ### 2. Install Dependencies
 ```bash

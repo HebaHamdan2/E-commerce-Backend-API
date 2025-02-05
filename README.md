@@ -52,7 +52,7 @@ This repository contains the backend for an e-commerce application built using *
 
 You can use the Postman collection for testing the API. The collection includes all the endpoints listed above with examples for each request.
 
-- **Postman Collection URL**: [E-commerce Backend Postman Collection](#https://documenter.getpostman.com/view/28559046/2s9YRB4D3y) 
+- **Postman Collection URL**: [E-commerce Backend Postman Collection](https://documenter.getpostman.com/view/28559046/2s9YRB4D3y) 
 
 ---
 
@@ -60,3 +60,19 @@ You can use the Postman collection for testing the API. The collection includes 
 
 Create a `.env` file with the following configuration:
 
+
+## Deployment
+
+This backend is deployed on **Render**. To deploy it yourself:
+
+1. Create an account on [Render](https://render.com).
+2. Connect your GitHub repository.
+3. Set up environment variables in the Render dashboard.
+4. Deploy the application.
+
+---
+
+## Installation
+
+1. Clone the repository:
+   ```bash

@@ -1,6 +1,5 @@
 import userModel from "../../../DB/model/user.model.js";
 import bcrypt from "bcryptjs";
-import cloudinary from "../../services/cloudinary.js";
 import jwt from "jsonwebtoken";
 import { sendEmail } from "../../services/email.js";
 import { customAlphabet, nanoid } from "nanoid";

@@ -14,13 +14,17 @@ export const profile= async(req,res,next)=>{
         await cloudinary.uploader.destroy(user.profilePic.public_id);
     }
     
-    return res.json({message:user});
+    return res.json({message:"success",user});
     }
+  export const getProfile=async(req,res,next)=>{
+    const user =await userModel.findById(req.user._id);
+    return res.json({message:user});
+
+  }  
     export const updateInfo = async (req, res, next) => {
         const { userName, phone, address, gender } = req.body;
         let updatedUserInfo = {};
       
-        // Check if each field exists and update the object accordingly
         if (userName) {
           updatedUserInfo.userName = userName;
         }
@@ -61,7 +65,7 @@ export const profile= async(req,res,next)=>{
         user.save();
         return res.status(200).json({message:"success"});
     }
- export const shareProfile=async(req,res,next)=>{
+export const shareProfile=async(req,res,next)=>{
         const user=await userModel.findById(req.params.id).select('userName email')
         if(!user){
             return next(new Error('User not found'));

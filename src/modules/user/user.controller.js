@@ -18,7 +18,7 @@ export const profile= async(req,res,next)=>{
     }
   export const getProfile=async(req,res,next)=>{
     const user =await userModel.findById(req.user._id);
-    return res.json({message:user});
+    return res.json({message:"success",user});
 
   }  
     export const updateInfo = async (req, res, next) => {

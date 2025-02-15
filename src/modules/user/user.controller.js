@@ -16,6 +16,39 @@ export const profile= async(req,res,next)=>{
     
     return res.json({message:user});
     }
+    export const updateInfo = async (req, res, next) => {
+        const { userName, phone, address, gender } = req.body;
+        let updatedUserInfo = {};
+      
+        // Check if each field exists and update the object accordingly
+        if (userName) {
+          updatedUserInfo.userName = userName;
+        }
+        if (phone) {
+          updatedUserInfo.phone = phone;
+        }
+        if (address) {
+          updatedUserInfo.address = address;
+        }
+        if (gender) {
+          updatedUserInfo.gender = gender;
+        }
+      
+        try {
+          // Update the user with the updated info
+          const user = await userModel.findByIdAndUpdate(req.user._id, updatedUserInfo, { new: true });
+      
+          // Check if the user is found and updated
+          if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+          }
+      
+          return res.json({ message: 'User updated successfully', user });
+        } catch (error) {
+          next(error); // Pass errors to error handler middleware
+        }
+      };
+        
  export const updatePassword=async(req,res,next)=>{
         const {oldPassword,newPassword}=req.body;
         const user=await userModel.findById(req.user._id);

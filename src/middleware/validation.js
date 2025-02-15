@@ -20,6 +20,10 @@ export const generalFields = {
     fieldname: joi.string().required(),
     dest: joi.string(),
   }),
+  userName: joi.string().min(4).max(20),
+  phone: joi.string().pattern(/^[0-9]+$/).optional(),  
+  address: joi.string().max(200).optional(),
+  gender: joi.string().valid("Male", "Female").optional(),
 };
 
 export const validation = (schema) => {

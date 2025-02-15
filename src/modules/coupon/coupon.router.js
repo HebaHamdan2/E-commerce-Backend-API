@@ -4,6 +4,8 @@ import * as validatores from "./coupon.validation.js";
 import { validation } from "../../middleware/validation.js";
 import { asyncHandler } from "../../services/errorHandling.js";
 import { endPoint } from "./coupon.endpoint.js";
+import{auth, roles}from '../../middleware/auth.js';
+
 const router = Router();
 
 router.post(

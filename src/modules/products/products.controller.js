@@ -27,12 +27,17 @@ export const getProducts = async (req, res) => {
     });
   }
 
-  mongooseQuery = mongooseQuery.select("name mainImage");
+  // Populate reviews field
+  mongooseQuery = mongooseQuery.populate("reviews"); // Populate the reviews field
+
+  mongooseQuery = mongooseQuery.select("name mainImage price"); // Select necessary fields
   const products = await mongooseQuery.sort(req.query.sort?.replaceAll(",", " "));
+
   const count = await productModel.countDocuments();
 
   return res.json({ message: "success", page: products.length, total: count, products });
 };
+
 
 export const createProduct = async (req, res, next) => {
   const { name, price, discount, categoryId, subcategoryId } = req.body;

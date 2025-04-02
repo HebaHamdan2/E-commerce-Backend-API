@@ -128,36 +128,50 @@ export const getOrder = async (req, res, next) => {
 };
 
 export const changeStatus = async (req, res, next) => {
-  const { orderId } = req.params;
-  const order = await orderModel.findById(orderId);
+  try {
+    const { orderId } = req.params;
+    const { status } = req.body;
 
-  if (!order) return next(new Error("Order not found", { cause: 404 }));
+    const order = await orderModel.findById(orderId);
+    if (!order) return next(new Error("Order not found", { cause: 404 }));
 
-  if (["cancelled", "delivered"].includes(order.status)) {
-    return next(new Error("Can't change status of this order"));
-  }
-
-  if (req.body.status === "cancelled") {
-    for (const product of order.products) {
-      await productModel.updateOne(
-        { _id: product.productId },
-        { $inc: { stock: product.quantity } }
-      );
+    // Allowed status transitions
+    const nonChangeableStatuses = ["cancelled", "delivered"];
+    if (nonChangeableStatuses.includes(order.status)) {
+      return next(new Error("Can't change status of this order", { cause: 400 }));
     }
 
-    if (order.couponName) {
-      await couponModel.updateOne(
-        { name: order.couponName },
-        { $pull: { usedBy: order.userId } }
-      );
+    // Validate new status
+    const validStatuses = ["pending", "shipped", "delivered", "cancelled"];
+    if (!validStatuses.includes(status)) {
+      return next(new Error("Invalid status provided", { cause: 400 }));
     }
+
+    // If order is canceled, restore stock and update coupon usage
+    if (status === "cancelled") {
+      await Promise.all(
+        order.products.map(async (product) => {
+          await productModel.updateOne(
+            { _id: product.productId },
+            { $inc: { stock: product.quantity } }
+          );
+        })
+      );
+
+      if (order.couponName) {
+        await couponModel.updateOne(
+          { name: order.couponName },
+          { $pull: { usedBy: order.userId } }
+        );
+      }
+    }
+
+    // Update the order status
+    order.status = status;
+    await order.save();
+
+    return res.json({ message: "Success", order });
+  } catch (error) {
+    return next(error);
   }
-
-  const newOrder = await orderModel.findByIdAndUpdate(
-    orderId,
-    { status: req.body.status },
-    { new: true }
-  );
-
-  return res.json({ message: "Success", newOrder });
 };

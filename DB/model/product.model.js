@@ -77,7 +77,7 @@ const productSchema = new Schema(
       ref: "User",
       required: true,
     },
-    reviews: [{ type: Types.ObjectId, ref: "Review" }], // Add this line
+    reviews: [{ type: Types.ObjectId, ref: "Review" }], 
   },
   { timestamps: true }
 );

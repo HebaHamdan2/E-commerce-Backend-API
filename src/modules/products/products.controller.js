@@ -26,11 +26,17 @@ export const getProducts = async (req, res) => {
       ],
     });
   }
+  mongooseQuery = mongooseQuery.populate({
+    path: "reviews",
+    model: "Review",
+    populate: {
+      path: "createdBy",
+      model: "User", 
+      select: "userName",
+    },
+  });
 
-  // Populate reviews field
-  mongooseQuery = mongooseQuery.populate("reviews"); // Populate the reviews field
-
-  mongooseQuery = mongooseQuery.select("name mainImage price"); // Select necessary fields
+  mongooseQuery = mongooseQuery.select("name mainImage price reviews"); 
   const products = await mongooseQuery.sort(req.query.sort?.replaceAll(",", " "));
 
   const count = await productModel.countDocuments();
@@ -51,14 +57,12 @@ export const createProduct = async (req, res, next) => {
   req.body.slug = slugify(name);
   req.body.finalPrice = price - (price * (discount || 0)) / 100;
 
-  // Upload main image
-  const { public_id, secure_url } = await cloudinary.uploader.upload(
+ const { public_id, secure_url } = await cloudinary.uploader.upload(
     req.files.mainImage[0].path,
     { folder: `${process.env.APP_NAME}/product/${req.body.name}/mainImage` }
   );
   req.body.mainImage = { public_id, secure_url };
 
-  // Upload sub-images
   req.body.subImages = [];
   for (const file of req.files.subImages) {
     const { public_id, secure_url } = await cloudinary.uploader.upload(

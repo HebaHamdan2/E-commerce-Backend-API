@@ -5,6 +5,7 @@ export const createProduct = joi.object({
   name: joi.string().min(3).max(25).required(),
   description: joi.string().min(2).max(150000),
   price: joi.number().positive().required(),
+  stock: joi.number().positive(),
   discount: joi.number().positive().min(0),
   file: joi.object({
     mainImage: joi.array().items(generalFields.file.required()).length(1),
@@ -12,6 +13,5 @@ export const createProduct = joi.object({
   }),
   status: joi.string().valid("Active", "Inactive"),
   categoryId: joi.string().required(),
-  subcategoryId: joi.string().required(),
-  variants: joi.required(),
-}).required();
+  subcategoryId: joi.string().required()
+});

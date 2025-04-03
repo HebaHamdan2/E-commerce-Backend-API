@@ -37,7 +37,6 @@ export const createReview = async (req, res, next) => {
     return next(new Error(`Error while adding review`, { cause: 400 }));
   }
 
-  // 🔥 **Update Product to Include the New Review**
   await productModel.findByIdAndUpdate(productId, {
     $push: { reviews: review._id },
   });

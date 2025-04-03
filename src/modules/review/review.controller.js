@@ -41,7 +41,14 @@ export const createReview = async (req, res, next) => {
     $push: { reviews: review._id },
   });
 
-  return res.status(201).json({ message: "Review added successfully", review });
+  const product = await productModel.findById(productId).populate("reviews");
+  const totalReviews = product.reviews.length;
+  const totalRating = product.reviews.reduce((acc, review) => acc + review.rating, 0);
+  product.avgRating = totalReviews ? totalRating / totalReviews : 0;
+
+  await product.save();
+
+  return res.status(201).json({ message: "Review added successfully", review, avgRating: product.avgRating });
 };
 
 export const updateReview = async (req, res, next) => {
@@ -50,7 +57,6 @@ export const updateReview = async (req, res, next) => {
     const { comment, rating } = req.body;
 
     const review = await reviewModel.findById(reviewId);
-
     if (!review) {
       return res.status(404).json({ message: "Review not found" });
     }
@@ -63,11 +69,20 @@ export const updateReview = async (req, res, next) => {
     review.rating = rating || review.rating;
 
     const updatedReview = await review.save();
-    return res.status(200).json({ message: "Review updated successfully", review: updatedReview });
+
+    const product = await productModel.findById(updatedReview.productId).populate("reviews");
+    const totalReviews = product.reviews.length;
+    const totalRating = product.reviews.reduce((acc, rev) => acc + rev.rating, 0);
+    product.avgRating = totalReviews ? totalRating / totalReviews : 0;
+
+    await product.save();
+
+    return res.status(200).json({ message: "Review updated successfully", review: updatedReview, avgRating: product.avgRating });
   } catch (error) {
     return next(error);
   }
 };
+
 export const getAlluserReviews = async (req, res, next) => {
     try {
       const reviews = await reviewModel.find({ createdBy: req.user._id });
@@ -79,10 +94,9 @@ export const getAlluserReviews = async (req, res, next) => {
       return next(error);
     }
   };
-  export const deleteReview = async (req, res, next) => {
+export const deleteReview = async (req, res, next) => {
     try {
       const { reviewId } = req.params;
-  
       const review = await reviewModel.findById(reviewId);
   
       if (!review) {
@@ -93,9 +107,19 @@ export const getAlluserReviews = async (req, res, next) => {
         return res.status(403).json({ message: "You cannot delete someone else's review" });
       }
   
+      const product = await productModel.findById(review.productId);
+  
       await review.remove();
-      return res.status(200).json({ message: "Review deleted successfully" });
+  
+      const totalReviews = product.reviews.length - 1;
+      const totalRating = product.reviews.reduce((acc, rev) => acc + rev.rating, 0) - review.rating;
+      product.avgRating = totalReviews > 0 ? totalRating / totalReviews : 0;
+  
+      await product.save();
+  
+      return res.status(200).json({ message: "Review deleted successfully", avgRating: product.avgRating });
     } catch (error) {
       return next(error);
     }
   };
+  

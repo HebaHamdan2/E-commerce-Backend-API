@@ -78,6 +78,10 @@ const productSchema = new Schema(
       required: true,
     },
     reviews: [{ type: Types.ObjectId, ref: "Review" }], 
+    avgRating: {
+      type: Number,
+      default: 0,
+    },
   },
   { timestamps: true }
 );

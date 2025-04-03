@@ -26,23 +26,18 @@ export const getProducts = async (req, res) => {
       ],
     });
   }
-  mongooseQuery = mongooseQuery.populate({
-    path: "reviews",
-    model: "Review",
-    populate: {
-      path: "createdBy",
-      model: "User", 
-      select: "userName profilePic",
-    },
-  });
 
-  mongooseQuery = mongooseQuery.select("name mainImage price reviews"); 
+  mongooseQuery = mongooseQuery
+    .populate({ path: "reviews", model: "Review", populate: { path: "createdBy", model: "User", select: "userName profilePic" } })
+    .select("name mainImage price avgRating reviews"); 
+
   const products = await mongooseQuery.sort(req.query.sort?.replaceAll(",", " "));
 
   const count = await productModel.countDocuments();
 
   return res.json({ message: "success", page: products.length, total: count, products });
 };
+
 
 
 export const createProduct = async (req, res, next) => {
@@ -87,6 +82,9 @@ export const getProductWithCategory = async (req, res) => {
 };
 
 export const getProduct = async (req, res) => {
-  const product = await productModel.findById(req.params.productId);
+  const product = await productModel.findById(req.params.productId)
+    .populate("reviews")
+    .select("name mainImage price avgRating reviews"); 
+
   return res.status(200).json({ message: "success", product });
 };

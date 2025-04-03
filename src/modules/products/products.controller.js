@@ -32,7 +32,7 @@ export const getProducts = async (req, res) => {
     populate: {
       path: "createdBy",
       model: "User", 
-      select: "userName",
+      select: "userName profilePic",
     },
   });
 

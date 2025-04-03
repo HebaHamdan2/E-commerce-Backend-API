@@ -35,6 +35,10 @@ const userShema = new Schema(
       default: "Active",
       enum: ["Active", "Inactive"],
     },
+    profilePic: {
+      type: Object,
+      default: null,
+    },
     role: {
       type: String,
       default: "User",

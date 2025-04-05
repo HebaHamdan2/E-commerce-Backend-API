@@ -82,7 +82,7 @@ export const getProductWithCategory = async (req, res) => {
 
 export const getProduct = async (req, res) => {
   const product = await productModel.findById(req.params.productId)
-    .populate("reviews");
+  .populate({ path: "reviews", model: "Review", populate: { path: "createdBy", model: "User", select: "userName profilePic" } })
 
   return res.status(200).json({ message: "success", product });
 };

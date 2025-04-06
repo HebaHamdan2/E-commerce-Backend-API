@@ -94,9 +94,10 @@ export const getAlluserReviews = async (req, res, next) => {
       return next(error);
     }
   };
-export const deleteReview = async (req, res, next) => {
+  export const deleteReview = async (req, res, next) => {
     try {
       const { reviewId } = req.params;
+  
       const review = await reviewModel.findById(reviewId);
   
       if (!review) {
@@ -109,11 +110,15 @@ export const deleteReview = async (req, res, next) => {
   
       const product = await productModel.findById(review.productId);
   
-      await review.remove();
+      const deletedRating = review.rating;
   
+      await reviewModel.findByIdAndDelete(reviewId);
       const totalReviews = product.reviews.length - 1;
-      const totalRating = product.reviews.reduce((acc, rev) => acc + rev.rating, 0) - review.rating;
+      const totalRating = product.reviews.reduce((acc, rev) => acc + rev.rating, 0) - deletedRating;
       product.avgRating = totalReviews > 0 ? totalRating / totalReviews : 0;
+  
+      // Remove review from product.reviews array
+      product.reviews = product.reviews.filter(r => r.toString() !== reviewId);
   
       await product.save();
   

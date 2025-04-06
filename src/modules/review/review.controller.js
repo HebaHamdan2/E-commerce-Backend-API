@@ -110,21 +110,29 @@ export const getAlluserReviews = async (req, res, next) => {
   
       const product = await productModel.findById(review.productId);
   
-      const deletedRating = review.rating;
+      // Remove review reference from product
+      product.reviews = product.reviews.filter((r) => r.toString() !== reviewId);
   
+      // Delete the review
       await reviewModel.findByIdAndDelete(reviewId);
-      const totalReviews = product.reviews.length - 1;
-      const totalRating = product.reviews.reduce((acc, rev) => acc + rev.rating, 0) - deletedRating;
-      product.avgRating = totalReviews > 0 ? totalRating / totalReviews : 0;
   
-      // Remove review from product.reviews array
-      product.reviews = product.reviews.filter(r => r.toString() !== reviewId);
+      // Recalculate average rating
+      const remainingReviews = await reviewModel.find({ productId: product._id });
+  
+      const totalReviews = remainingReviews.length;
+      const totalRating = remainingReviews.reduce((acc, rev) => acc + rev.rating, 0);
+  
+      product.avgRating = totalReviews > 0 ? totalRating / totalReviews : 0;
   
       await product.save();
   
-      return res.status(200).json({ message: "Review deleted successfully", avgRating: product.avgRating });
+      return res.status(200).json({
+        message: "Review deleted successfully",
+        avgRating: product.avgRating,
+      });
     } catch (error) {
       return next(error);
     }
   };
+  
   

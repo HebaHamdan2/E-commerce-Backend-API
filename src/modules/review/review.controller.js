@@ -85,7 +85,7 @@ export const updateReview = async (req, res, next) => {
 
 export const getAlluserReviews = async (req, res, next) => {
     try {
-      const reviews = await reviewModel.find({ createdBy: req.user._id });
+      const reviews = await reviewModel.find({ createdBy: req.user._id }).populate("productId");
       if (!reviews.length) {
         return res.status(404).json({ message: "No reviews found" });
       }

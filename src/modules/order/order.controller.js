@@ -123,7 +123,7 @@ export const cancelOrder = async (req, res, next) => {
 };
 
 export const getOrder = async (req, res, next) => {
-  const orders = await orderModel.find({ userId: req.user._id });
+  const orders = await orderModel.find({ userId: req.user._id }).populate("products.productId");
   return res.status(200).json({ message: "Success", orders });
 };
 

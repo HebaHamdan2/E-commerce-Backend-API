@@ -11,8 +11,10 @@ import reviewRouter from "./review/review.router.js"
 import cors from "cors"
 import { globalErrorHandler } from "../services/errorHandling.js";
 const initApp = async (app, express) => {
-  app.use(cors(
-  ));
+  app.use(cors({
+    origin: 'http://localhost:5173',
+    credentials: true              
+  }));
   connectDB();
   app.use(express.json());
   app.get("/", (req, res) => {

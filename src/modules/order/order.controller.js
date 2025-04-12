@@ -10,9 +10,7 @@ export const createOrder = async (req, res, next) => {
   if (!cart || cart.products.length === 0) {
     return next(new Error("Cart is empty", { cause: 400 }));
   }
-
   req.body.products = cart.products;
-
   if (couponName) {
     const coupon = await couponModel.findOne({ name: couponName });
     if (!coupon) return next(new Error("Coupon not found", { cause: 404 }));

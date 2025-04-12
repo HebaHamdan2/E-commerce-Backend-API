@@ -12,7 +12,7 @@ import cors from "cors"
 import { globalErrorHandler } from "../services/errorHandling.js";
 const initApp = async (app, express) => {
   app.use(cors({
-    origin: 'http://localhost:5173',
+    origin: '*',
     credentials: true              
   }));
   connectDB();

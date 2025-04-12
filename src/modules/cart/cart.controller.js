@@ -39,7 +39,6 @@ export const createCart = async (req, res, next) => {
 
 export const removeItem = async (req, res) => {
   const { productId } = req.body;
-
   await cartModel.updateOne(
     { userId: req.user._id },
     { $pull: { products: { productId } } }
